@@ -1,6 +1,6 @@
 import { useState, useRef, KeyboardEvent } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '../ui/button';
+import { Textarea } from '../ui/textarea';
 import { Send, Loader2 } from 'lucide-react';
 
 interface ChatInputProps {
