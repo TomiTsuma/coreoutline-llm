@@ -54,7 +54,8 @@ const ChatMessage = ({ message, isUser, isStreaming = false }: ChatMessageProps)
           {isUser ? (
             <p className="text-sm whitespace-pre-wrap">{message}</p>
           ) : (
-            <div className="prose prose-sm max-w-none dark:prose-invert">
+            <div className="prose prose-sm max-w-none dark:prose-invert text-white">
+
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
