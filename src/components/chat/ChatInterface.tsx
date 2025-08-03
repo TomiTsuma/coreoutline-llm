@@ -111,10 +111,10 @@ This is just a demo response. Replace the \`simulateAIResponse\` function with y
   return (
     <div className="flex flex-col h-screen max-w-6xl mx-auto">
       {/* Header */}
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4">
+      <div className="bg-glass-background backdrop-blur-md border-b border-glass-border shadow-glass p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
+            <div className="p-2 bg-gradient-to-br from-primary/20 to-primary-glow/20 backdrop-blur-sm rounded-xl border border-glass-border">
               <MessageSquare className="h-6 w-6 text-primary" />
             </div>
             <div>
@@ -128,7 +128,7 @@ This is just a demo response. Replace the \`simulateAIResponse\` function with y
               variant="outline"
               size="sm"
               onClick={clearChat}
-              className="gap-2"
+              className="gap-2 bg-glass-card backdrop-blur-sm border-glass-border hover:bg-glass-background/80 transition-all duration-200"
             >
               <Trash2 className="h-4 w-4" />
               Clear Chat
@@ -142,7 +142,7 @@ This is just a demo response. Replace the \`simulateAIResponse\` function with y
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center max-w-md">
-              <div className="p-4 bg-primary/10 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <div className="p-4 bg-gradient-to-br from-primary/20 to-primary-glow/20 backdrop-blur-sm rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center border border-glass-border shadow-glass">
                 <MessageSquare className="h-8 w-8 text-primary" />
               </div>
               <h2 className="text-xl font-semibold mb-2">Welcome to AI Chat</h2>

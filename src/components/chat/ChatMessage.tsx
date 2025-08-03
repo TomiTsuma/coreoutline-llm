@@ -45,10 +45,10 @@ const ChatMessage = ({ message, isUser, isStreaming = false }: ChatMessageProps)
       
       <div className={`flex flex-col max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
         <div
-          className={`rounded-2xl px-4 py-3 shadow-sm ${
+          className={`rounded-2xl px-4 py-3 backdrop-blur-md border shadow-glass transition-all duration-200 ${
             isUser
-              ? 'bg-user-message text-user-message-foreground ml-auto'
-              : 'bg-ai-message text-ai-message-foreground'
+              ? 'bg-gradient-to-br from-user-message to-primary-glow text-user-message-foreground ml-auto border-primary/20'
+              : 'bg-glass-card text-ai-message-foreground border-glass-border'
           }`}
         >
           {isUser ? (

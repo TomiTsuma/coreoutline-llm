@@ -40,7 +40,7 @@ const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
   };
 
   return (
-    <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4">
+    <div className="bg-glass-background backdrop-blur-md border-t border-glass-border shadow-glass p-4">
       <div className="flex gap-3 items-end max-w-4xl mx-auto">
         <div className="flex-1 relative">
           <Textarea
@@ -49,7 +49,7 @@ const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder="Type your message here... (Shift+Enter for new line)"
-            className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl border-2 focus:border-primary transition-colors"
+            className="min-h-[44px] max-h-[120px] resize-none pr-12 rounded-xl border-2 focus:border-primary transition-colors bg-glass-input backdrop-blur-sm border-glass-border placeholder:text-muted-foreground/70"
             disabled={isLoading}
           />
         </div>
@@ -58,7 +58,7 @@ const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
           onClick={handleSend}
           disabled={!message.trim() || isLoading}
           size="default"
-          className="h-11 w-11 p-0 rounded-xl shadow-elegant hover:shadow-glow transition-all duration-200"
+          className="h-11 w-11 p-0 rounded-xl shadow-glass hover:shadow-glow transition-all duration-200 bg-gradient-to-br from-primary to-primary-glow hover:from-primary-glow hover:to-primary border-0"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />

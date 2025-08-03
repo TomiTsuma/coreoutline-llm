@@ -73,6 +73,12 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				glass: {
+					background: 'hsla(var(--glass-background))',
+					border: 'hsla(var(--glass-border))',
+					card: 'hsla(var(--glass-card))',
+					input: 'hsla(var(--glass-input))'
 				}
 			},
 			borderRadius: {
@@ -135,7 +141,11 @@ export default {
 			},
 			boxShadow: {
 				'glow': 'var(--shadow-glow)',
-				'elegant': 'var(--shadow-elegant)'
+				'elegant': 'var(--shadow-elegant)',
+				'glass': 'var(--shadow-glass)'
+			},
+			backdropBlur: {
+				xs: '2px',
 			}
 		}
 	},
