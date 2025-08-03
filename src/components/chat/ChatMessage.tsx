@@ -15,24 +15,13 @@ const ChatMessage = ({ message, isUser, isStreaming = false }: ChatMessageProps)
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    if (isStreaming && !isUser) {
-      setDisplayedText('');
-      setCurrentIndex(0);
+    if (!isStreaming || isUser) {
+      setDisplayedText(message);
     } else {
+      // For streaming messages, display the content directly as it comes in
       setDisplayedText(message);
     }
   }, [message, isStreaming, isUser]);
-
-  useEffect(() => {
-    if (isStreaming && !isUser && currentIndex < message.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText(message.slice(0, currentIndex + 1));
-        setCurrentIndex(currentIndex + 1);
-      }, 20); // Adjust speed here (lower = faster)
-
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, message, isStreaming, isUser]);
 
   return (
     <div className={`flex gap-3 p-4 animate-fade-in ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -89,8 +78,8 @@ const ChatMessage = ({ message, isUser, isStreaming = false }: ChatMessageProps)
               >
                 {isStreaming ? displayedText : message}
               </ReactMarkdown>
-              {isStreaming && currentIndex < message.length && (
-                <span className="inline-block w-2 h-4 bg-primary animate-pulse-slow ml-1" />
+              {isStreaming && (
+                <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1 cursor-blink" />
               )}
             </div>
           )}

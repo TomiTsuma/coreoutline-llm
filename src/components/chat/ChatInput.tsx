@@ -58,7 +58,7 @@ const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
           onClick={handleSend}
           disabled={!message.trim() || isLoading}
           size="default"
-          className="h-11 w-11 p-0 rounded-xl shadow-glass hover:shadow-glow transition-all duration-200 bg-gradient-to-br from-primary to-primary-glow hover:from-primary-glow hover:to-primary border-0"
+          className="h-11 w-11 p-0 rounded-xl shadow-glass hover:shadow-glow transition-all duration-200 bg-gradient-to-br from-primary to-primary-glow hover:from-primary-glow hover:to-primary border-0 disabled:opacity-50"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -69,7 +69,7 @@ const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
       </div>
       
       <p className="text-xs text-muted-foreground text-center mt-2 max-w-4xl mx-auto">
-        Press Enter to send • Shift+Enter for new line
+        Press Enter to send • Shift+Enter for new line {isLoading && '• AI is responding...'}
       </p>
     </div>
   );
