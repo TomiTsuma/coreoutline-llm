@@ -26,31 +26,80 @@ const ChatInterface = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Simulate AI response - Replace this with your actual LLM API call
-  const simulateAIResponse = async (userMessage: string): Promise<string> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Sample markdown response for demonstration
-    return `Thank you for your message: "${userMessage}"
+  // Stream AI response from your API
+  const streamAIResponse = async (userMessage: string, aiMessageId: string) => {
+    try {
+      const response = await fetch('http://localhost:6000/predict/stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: userMessage }),
+      });
 
-Here's a sample **markdown response** to demonstrate the streaming feature:
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-## Key Features:
-- **Streaming responses** with typewriter effect
-- **Markdown support** for rich formatting
-- \`Code highlighting\` and syntax support
-- Lists and bullet points
-- > Blockquotes for emphasis
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('No reader available');
+      }
 
-### Code Example:
-\`\`\`javascript
-function greet(name) {
-  return \`Hello, \${name}! Welcome to the AI chat.\`;
-}
-\`\`\`
+      const decoder = new TextDecoder();
+      let accumulatedContent = '';
 
-This is just a demo response. Replace the \`simulateAIResponse\` function with your actual LLM API call to integrate your trained model.`;
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.trim() === '') continue;
+          
+          if (line === 'data: [DONE]') {
+            // Mark streaming as complete
+            setMessages(prev => 
+              prev.map(msg => 
+                msg.id === aiMessageId 
+                  ? { ...msg, isStreaming: false }
+                  : msg
+              )
+            );
+            return;
+          }
+
+          if (line.startsWith('data: ')) {
+            try {
+              const jsonData = line.slice(6); // Remove "data: " prefix
+              const tokenData = JSON.parse(jsonData);
+              const token = tokenData.token?.replace('<|endoftext|>', '') || '';
+              
+              if (token) {
+                accumulatedContent += token;
+                
+                // Update the message content in real-time
+                setMessages(prev => 
+                  prev.map(msg => 
+                    msg.id === aiMessageId 
+                      ? { ...msg, content: accumulatedContent }
+                      : msg
+                  )
+                );
+              }
+            } catch (parseError) {
+              console.warn('Failed to parse token data:', parseError);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Streaming error:', error);
+      throw error;
+    }
   };
 
   const handleSendMessage = async (content: string) => {
@@ -65,36 +114,29 @@ This is just a demo response. Replace the \`simulateAIResponse\` function with y
     setIsLoading(true);
 
     try {
-      // Get AI response
-      const aiResponse = await simulateAIResponse(content);
-      
-      // Add AI message with streaming
+      // Add AI message with streaming placeholder
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: aiResponse,
+        content: '',
         isUser: false,
         isStreaming: true,
       };
       
       setMessages(prev => [...prev, aiMessage]);
       
-      // Stop streaming after the message is complete
-      setTimeout(() => {
-        setMessages(prev => 
-          prev.map(msg => 
-            msg.id === aiMessage.id 
-              ? { ...msg, isStreaming: false }
-              : msg
-          )
-        );
-      }, aiResponse.length * 20 + 500); // Adjust based on streaming speed
+      // Start streaming the AI response
+      await streamAIResponse(content, aiMessage.id);
       
     } catch (error) {
+      console.error('Error getting AI response:', error);
       toast({
         title: "Error",
-        description: "Failed to get AI response. Please try again.",
+        description: "Failed to get AI response. Please check if the API server is running on localhost:6000.",
         variant: "destructive",
       });
+      
+      // Remove the empty AI message on error
+      setMessages(prev => prev.filter(msg => !msg.isStreaming || msg.content !== ''));
     } finally {
       setIsLoading(false);
     }
