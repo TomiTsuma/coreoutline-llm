@@ -38,7 +38,7 @@ const ChatInterface = () => {
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
-        const response = await fetch('api/suggestions');
+        const response = await fetch('https://21370ce76b3f.ngrok-free.app/suggestions');
         if (!response.ok) {
           throw new Error('Failed to fetch suggestions');
         }
@@ -71,7 +71,7 @@ const ChatInterface = () => {
       setIsLoading(true);
       
       // First, send the POST request to initiate streaming
-      const response = await fetch('api/predict/stream', {
+      const response = await fetch('https://21370ce76b3f.ngrok-free.app/predict/stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
