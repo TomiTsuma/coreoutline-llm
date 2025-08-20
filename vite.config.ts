@@ -9,7 +9,7 @@ export default defineConfig({
     port: 7000,
     proxy: {
       '/api': { // Proxy requests starting with /api
-        target: 'http://localhost:6000', // Your Flask API URL
+        target: 'https://21370ce76b3f.ngrok-free.app ', // Your Flask API URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''), // Remove /api prefix
       },
