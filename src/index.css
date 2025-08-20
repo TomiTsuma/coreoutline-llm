@@ -8,73 +8,77 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* AI Chat Theme - Modern gradients and colors */
-    --background: 240 10% 3.9%;
+    /* Updated color palette - Modern blue gradient theme */
+    --background: 210 40% 3.9%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
+    --card: 210 40% 3.9%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 210 40% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 262 83% 58%;
-    --primary-foreground: 210 20% 98%;
-    --primary-glow: 270 91% 65%;
+    /* Primary color from the palette */
+    --primary: 199 90% 43%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 199 90% 50%;
 
-    --secondary: 240 3.7% 15.9%;
+    /* Secondary color from the palette */
+    --secondary: 199 98% 25%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    /* Muted colors */
+    --muted: 199 30% 15%;
+    --muted-foreground: 199 10% 70%;
 
-    --accent: 240 3.7% 15.9%;
+    /* Accent color */
+    --accent: 199 50% 25%;
     --accent-foreground: 0 0% 98%;
 
+    /* Destructive color */
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 262 83% 58%;
+    /* UI elements */
+    --border: 199 50% 25%;
+    --input: 199 50% 20%;
+    --ring: 199 90% 43%;
 
     /* Chat specific colors */
-    --user-message: 262 83% 58%;
+    --user-message: 199 90% 43%;
     --user-message-foreground: 0 0% 98%;
-    --ai-message: 240 4.8% 95.9%;
-    --ai-message-foreground: 240 10% 3.9%;
+    --ai-message: 199 40% 15%;
+    --ai-message-foreground: 0 0% 98%;
 
     /* Glass UI colors */
-    --glass-background: 240 10% 3.9% / 0.8;
-    --glass-border: 240 5% 64.9% / 0.2;
-    --glass-card: 240 10% 10% / 0.6;
-    --glass-input: 240 8% 15% / 0.7;
+    --glass-background: 210 40% 3.9% / 0.8;
+    --glass-border: 199 50% 25% / 0.3;
+    --glass-card: 210 40% 10% / 0.6;
+    --glass-input: 199 50% 15% / 0.7;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(270 91% 65%));
-    --gradient-background: radial-gradient(ellipse at top, hsl(240 10% 8%), hsl(240 10% 3.9%)), 
-                          linear-gradient(135deg, hsl(240 10% 3.9%), hsl(237 22% 11%));
-    --gradient-subtle: linear-gradient(180deg, hsl(240 10% 3.9%), hsl(240 6% 10%));
-    --gradient-glass: linear-gradient(135deg, hsla(240, 10%, 15%, 0.8), hsla(240, 10%, 8%, 0.6));
+    /* Updated gradients using the new palette */
+    --gradient-primary: linear-gradient(135deg, hsl(199 90% 43%), hsl(188 90% 43%));
+    --gradient-background: radial-gradient(ellipse at top, hsl(210 40% 8%), hsl(210 40% 3.9%)), 
+                          linear-gradient(135deg, hsl(210 40% 3.9%), hsl(199 50% 11%));
+    --gradient-subtle: linear-gradient(180deg, hsl(210 40% 3.9%), hsl(199 50% 10%));
+    --gradient-glass: linear-gradient(135deg, hsla(199, 50%, 15%, 0.8), hsla(210, 40%, 8%, 0.6));
 
-    /* Shadows */
-    --shadow-glow: 0 0 40px hsl(262 83% 58% / 0.15);
-    --shadow-elegant: 0 8px 32px -8px hsl(262 83% 58% / 0.25);
-    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    /* Updated shadows */
+    --shadow-glow: 0 0 40px hsl(199 90% 43% / 0.15);
+    --shadow-elegant: 0 8px 32px -8px hsl(199 90% 43% / 0.25);
+    --shadow-glass: 0 8px 32px 0 rgba(0, 119, 182, 0.37);
 
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-foreground: 199 50% 11%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 199 90% 43%;
+    --sidebar-primary-foreground: 0 0% 100%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent: 199 50% 25%;
+    --sidebar-accent-foreground: 0 0% 98%;
 
     --sidebar-border: 220 13% 91%;
 
@@ -83,59 +87,59 @@ All colors MUST be HSL.
 
   .light {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 199 50% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 199 50% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover-foreground: 199 50% 11%;
 
-    --primary: 262 83% 58%;
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 270 91% 65%;
+    /* Primary color from the palette */
+    --primary: 199 90% 43%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 188 90% 43%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    /* Light mode secondary */
+    --secondary: 199 50% 96%;
+    --secondary-foreground: 199 50% 20%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    /* Light mode muted */
+    --muted: 199 20% 96%;
+    --muted-foreground: 199 10% 40%;
 
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    /* Light mode accent */
+    --accent: 199 50% 96%;
+    --accent-foreground: 199 50% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 262 83% 58%;
+    --border: 199 20% 89%;
+    --input: 199 20% 89%;
+    --ring: 199 90% 43%;
 
-    /* Chat specific colors for light mode */
-    --user-message: 262 83% 58%;
-    --user-message-foreground: 0 0% 98%;
-    --ai-message: 240 4.8% 95.9%;
-    --ai-message-foreground: 240 10% 3.9%;
+    --radius: 0.75rem;
+
+    --sidebar-background: 199 50% 98%;
+    --sidebar-foreground: 199 50% 20%;
+    --sidebar-primary: 199 90% 43%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 199 50% 96%;
+    --sidebar-accent-foreground: 199 50% 20%;
+    --sidebar-border: 199 30% 89%;
+    --sidebar-ring: 199 90% 43%;
 
     /* Glass UI colors for light mode */
     --glass-background: 255 255 255 / 0.9;
-    --glass-border: 240 5.9% 10% / 0.1;
-    --glass-card: 255 255 255 / 0.7;
-    --glass-input: 240 4.8% 95.9% / 0.8;
+    --glass-border: 199 50% 20% / 0.1;
+    --glass-card: 255 255 255 / 0.8;
+    --glass-input: 199 50% 96% / 0.9;
 
     /* Light mode gradients */
-    --gradient-background: radial-gradient(ellipse at top, hsl(0 0% 98%), hsl(240 4.8% 95.9%)),
-                          linear-gradient(135deg, hsl(0 0% 100%), hsl(240 4.8% 95.9%));
-    --gradient-glass: linear-gradient(135deg, hsla(240, 4%, 95%, 0.9), hsla(240, 4%, 90%, 0.7));
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --gradient-background: radial-gradient(ellipse at top, hsl(199 50% 98%), hsl(199 50% 96%)),
+                          linear-gradient(135deg, hsl(199 50% 100%), hsl(199 50% 96%));
+    --gradient-glass: linear-gradient(135deg, hsla(199, 50%, 95%, 0.9), hsla(199, 50%, 90%, 0.7));
   }
 }
 
