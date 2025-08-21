@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/button';
 import { Trash2, MessageSquare, Sparkles } from 'lucide-react';
 import { useToast } from '../../hooks/use-toast';
 import { Card, CardContent } from '../../components/ui/card';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface Message {
   id: string;
@@ -36,27 +37,76 @@ const ChatInterface = () => {
 
   // Fetch suggestions when component mounts
   useEffect(() => {
-    const fetchSuggestions = async () => {
-      try {
-        const response = await fetch('https://21370ce76b3f.ngrok-free.app/suggestions');
-        if (!response.ok) {
-          throw new Error('Failed to fetch suggestions');
-        }
-        const data = await response.json();
-        console.log("This is the suggestions:", data)
-        setSuggestions(data);
-      } catch (error) {
-        console.error('Error fetching suggestions:', error);
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'Failed to load suggestions. Please try again later.',
-        });
+    const fallbackData = {
+      questions: [
+        {
+          metric_type: "Financial Analytics",
+          question:
+            "What are the top three drivers of revenue growth in the last quarter, and how does that compare to the same quarter last year?",
+        },
+        {
+          metric_type: "SaaS",
+          question:
+            "Which customer segments have the highest churn rate, and what are the leading indicators that predict churn within those segments?",
+        },
+        {
+          metric_type: "Social Media",
+          question:
+            "What are the key themes and sentiment trends emerging from social media mentions related to our brand and competitors in the past month, and how are they correlated with customer acquisition costs?",
+        },
+        {
+          metric_type: "Customer",
+          question:
+            "What is the lifetime value (LTV) of customers acquired through different marketing channels, and how can we optimize our marketing spend to improve overall LTV?",
+        },
+        {
+          metric_type: "Customer Feedback",
+          question:
+            "Based on customer feedback across all channels (surveys, reviews, support tickets), what are the top three areas where we can improve our product or service to increase customer satisfaction and reduce negative feedback?",
+        },
+      ],
+    } as { questions: Suggestion[] };
+
+    const ask_gemini = async (): Promise<void> => {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+      if (!apiKey) {
+        console.warn('VITE_GEMINI_API_KEY is not set. Falling back to default suggestions.');
+        setSuggestions(fallbackData.questions);
+        return;
       }
+
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const prompt =
+          "I want you to suggest five potential questions I can ask an LLM that was trained purely on financial, SaaS, Social Media, Customer, and Customer Feedback analytics data. Return the questions in a JSON array in the format {\"questions\": [{\"metric_type\": \"Financial Analytics\", \"question\": \"question 1\"}, {\"metric_type\": \"SaaS\", \"question\": \"question 2\"}, {\"metric_type\": \"Social Media\", \"question\": \"question 3\"}, {\"metric_type\": \"Customer\", \"question\": \"question 4\"}, {\"metric_type\": \"Customer Feedback\", \"question\": \"question 5\"}]}";
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        // Remove common code fences and try to extract the first JSON object
+        const withoutFences = text.replace(/```json|```/g, '').trim();
+        const start = withoutFences.indexOf('{');
+        const end = withoutFences.lastIndexOf('}');
+        const jsonCandidate = start !== -1 && end !== -1 ? withoutFences.slice(start, end + 1) : withoutFences;
+        const parsed = JSON.parse(jsonCandidate);
+        if (Array.isArray(parsed?.questions) && parsed.questions.length > 0) {
+          setSuggestions(parsed.questions as Suggestion[]);
+          return;
+        }
+        setSuggestions(fallbackData.questions);
+      } catch (error) {
+        console.error('Error fetching suggestions from Gemini:', error);
+        setSuggestions(fallbackData.questions);
+      }
+    };
+
+    const fetchSuggestions = async () => {
+      await ask_gemini();
     };
 
     fetchSuggestions();
   }, []);
+
 
   const handleSuggestionClick = (question: string) => {
     // Hide suggestions when one is selected
@@ -69,7 +119,7 @@ const ChatInterface = () => {
   const streamAIResponse = async (userMessage: string, aiMessageId: string) => {
     try {
       setIsLoading(true);
-      
+
       // First, send the POST request to initiate streaming
       const response = await fetch('https://21370ce76b3f.ngrok-free.app/predict/stream', {
         method: 'POST',
@@ -94,13 +144,13 @@ const ChatInterface = () => {
       // Use the Fetch API with ReadableStream for streaming
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      
+
       let accumulatedContent = '';
-      
+
       try {
         while (true) {
           const { done, value } = await reader.read();
-          
+
           if (done) {
             break;
           }
@@ -132,7 +182,7 @@ const ChatInterface = () => {
       } finally {
         reader.releaseLock();
       }
-      
+
       // Mark streaming as complete
       setMessages(prevMessages =>
         prevMessages.map(msg =>
@@ -143,25 +193,25 @@ const ChatInterface = () => {
 
     } catch (error) {
       console.error('Stream error:', error);
-      
+
       // Remove the streaming message and show error
       setMessages(prevMessages =>
         prevMessages.filter(msg => msg.id !== aiMessageId)
       );
-      
+
       let errorMessage = "Failed to connect to the server. Please check:";
       if (error instanceof TypeError && error.message.includes('fetch')) {
         errorMessage += "\n• Is the server running on port 6000?\n• Check CORS configuration\n• Verify the server URL";
       } else if (error instanceof Error) {
         errorMessage = error.message;
       }
-      
+
       toast({
         title: "Connection Error",
         description: errorMessage,
         variant: "destructive"
       });
-      
+
       setIsLoading(false);
     }
   };
@@ -175,19 +225,19 @@ const ChatInterface = () => {
       body: JSON.stringify({
         prompt: userMessage
       })
-    }) 
-    .then(response => response.json())
-    .then(data => {
-      setMessages(prev => [...prev, { id: aiMessageId, content: data.response, isUser: false }]);
     })
-    .catch(error => {
-      console.error('Error:', error);
-      toast({
-        title: "Connection Error",
-        description: "Failed to connect to the non stream server. Please check:",
-        variant: "destructive"
+      .then(response => response.json())
+      .then(data => {
+        setMessages(prev => [...prev, { id: aiMessageId, content: data.response, isUser: false }]);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        toast({
+          title: "Connection Error",
+          description: "Failed to connect to the non stream server. Please check:",
+          variant: "destructive"
+        });
       });
-    });
   }
 
   const handleSendMessage = async (content: string) => {
@@ -263,7 +313,7 @@ const ChatInterface = () => {
                 <h2 className="text-2xl font-bold mb-2">Welcome to Core&Outline</h2>
                 <p className="text-muted-foreground mb-6">
                   This is the beta version of our AI business intelligence assistant.
-                  Ask questions about business intelligence, data analysis, pricing, financial metrics, 
+                  Ask questions about business intelligence, data analysis, pricing, financial metrics,
                   SaaS metrics, social media analytics, and more.
                 </p>
               </div>
@@ -276,7 +326,7 @@ const ChatInterface = () => {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {suggestions.map((suggestion, index) => (
-                      <Card 
+                      <Card
                         key={index}
                         className="cursor-pointer hover:bg-muted/50 transition-colors border-border/50"
                         onClick={() => handleSuggestionClick(suggestion.question)}
