@@ -35,78 +35,73 @@ const ChatInterface = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Fetch suggestions when component mounts
-  useEffect(() => {
-    const fallbackData = {
-      questions: [
-        {
-          metric_type: "Financial Analytics",
-          question:
-            "What are the top three drivers of revenue growth in the last quarter, and how does that compare to the same quarter last year?",
-        },
-        {
-          metric_type: "SaaS",
-          question:
-            "Which customer segments have the highest churn rate, and what are the leading indicators that predict churn within those segments?",
-        },
-        {
-          metric_type: "Social Media",
-          question:
-            "What are the key themes and sentiment trends emerging from social media mentions related to our brand and competitors in the past month, and how are they correlated with customer acquisition costs?",
-        },
-        {
-          metric_type: "Customer",
-          question:
-            "What is the lifetime value (LTV) of customers acquired through different marketing channels, and how can we optimize our marketing spend to improve overall LTV?",
-        },
-        {
-          metric_type: "Customer Feedback",
-          question:
-            "Based on customer feedback across all channels (surveys, reviews, support tickets), what are the top three areas where we can improve our product or service to increase customer satisfaction and reduce negative feedback?",
-        },
-      ],
-    } as { questions: Suggestion[] };
+  // Suggestions source and retriever
+  const fallbackData = {
+    questions: [
+      {
+        metric_type: "Financial Analytics",
+        question:
+          "What are the top three drivers of revenue growth in the last quarter, and how does that compare to the same quarter last year?",
+      },
+      {
+        metric_type: "SaaS",
+        question:
+          "Which customer segments have the highest churn rate, and what are the leading indicators that predict churn within those segments?",
+      },
+      {
+        metric_type: "Social Media",
+        question:
+          "What are the key themes and sentiment trends emerging from social media mentions related to our brand and competitors in the past month, and how are they correlated with customer acquisition costs?",
+      },
+      {
+        metric_type: "Customer",
+        question:
+          "What is the lifetime value (LTV) of customers acquired through different marketing channels, and how can we optimize our marketing spend to improve overall LTV?",
+      },
+      {
+        metric_type: "Customer Feedback",
+        question:
+          "Based on customer feedback across all channels (surveys, reviews, support tickets), what are the top three areas where we can improve our product or service to increase customer satisfaction and reduce negative feedback?",
+      },
+    ],
+  } as { questions: Suggestion[] };
 
-    const ask_gemini = async (): Promise<void> => {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
-      if (!apiKey) {
-        console.warn('VITE_GEMINI_API_KEY is not set. Falling back to default suggestions.');
-        setSuggestions(fallbackData.questions);
+  const ask_gemini = async (): Promise<void> => {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+    if (!apiKey) {
+      console.warn('VITE_GEMINI_API_KEY is not set. Falling back to default suggestions.');
+      setSuggestions(fallbackData.questions);
+      return;
+    }
+
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+      const prompt =
+        "I want you to suggest five potential questions I can ask an LLM that was trained purely on financial, SaaS, Social Media, Customer, and Customer Feedback analytics data. Return the questions in a JSON array in the format {\"questions\": [{\"metric_type\": \"Financial Analytics\", \"question\": \"question 1\"}, {\"metric_type\": \"SaaS\", \"question\": \"question 2\"}, {\"metric_type\": \"Social Media\", \"question\": \"question 3\"}, {\"metric_type\": \"Customer\", \"question\": \"question 4\"}, {\"metric_type\": \"Customer Feedback\", \"question\": \"question 5\"}]}";
+
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      const withoutFences = text.replace(/```json|```/g, '').trim();
+      const start = withoutFences.indexOf('{');
+      const end = withoutFences.lastIndexOf('}');
+      const jsonCandidate = start !== -1 && end !== -1 ? withoutFences.slice(start, end + 1) : withoutFences;
+      const parsed = JSON.parse(jsonCandidate);
+      if (Array.isArray(parsed?.questions) && parsed.questions.length > 0) {
+        setSuggestions(parsed.questions as Suggestion[]);
         return;
       }
+      setSuggestions(fallbackData.questions);
+    } catch (error) {
+      console.error('Error fetching suggestions from Gemini:', error);
+      setSuggestions(fallbackData.questions);
+    }
+  };
 
-      try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        const prompt =
-          "I want you to suggest five potential questions I can ask an LLM that was trained purely on financial, SaaS, Social Media, Customer, and Customer Feedback analytics data. Return the questions in a JSON array in the format {\"questions\": [{\"metric_type\": \"Financial Analytics\", \"question\": \"question 1\"}, {\"metric_type\": \"SaaS\", \"question\": \"question 2\"}, {\"metric_type\": \"Social Media\", \"question\": \"question 3\"}, {\"metric_type\": \"Customer\", \"question\": \"question 4\"}, {\"metric_type\": \"Customer Feedback\", \"question\": \"question 5\"}]}";
-
-        const result = await model.generateContent(prompt);
-        const text = result.response.text();
-        // Remove common code fences and try to extract the first JSON object
-        const withoutFences = text.replace(/```json|```/g, '').trim();
-        const start = withoutFences.indexOf('{');
-        const end = withoutFences.lastIndexOf('}');
-        const jsonCandidate = start !== -1 && end !== -1 ? withoutFences.slice(start, end + 1) : withoutFences;
-        const parsed = JSON.parse(jsonCandidate);
-        if (Array.isArray(parsed?.questions) && parsed.questions.length > 0) {
-          setSuggestions(parsed.questions as Suggestion[]);
-          return;
-        }
-        setSuggestions(fallbackData.questions);
-      } catch (error) {
-        console.error('Error fetching suggestions from Gemini:', error);
-        setSuggestions(fallbackData.questions);
-      }
-    };
-
-    const fetchSuggestions = async () => {
-      await ask_gemini();
-    };
-
-    fetchSuggestions();
+  // Fetch suggestions when component mounts
+  useEffect(() => {
+    ask_gemini();
   }, []);
-
 
   const handleSuggestionClick = (question: string) => {
     // Hide suggestions when one is selected
@@ -190,6 +185,10 @@ const ChatInterface = () => {
         )
       );
       setIsLoading(false);
+
+      // Refresh suggestions after complete response
+      await ask_gemini();
+      setShowSuggestions(true);
 
     } catch (error) {
       console.error('Stream error:', error);
@@ -357,6 +356,33 @@ const ChatInterface = () => {
               />
             ))}
             <div ref={messagesEndRef} />
+
+            {shouldShowSuggestions && (
+              <div className="mt-6">
+                <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Try asking about...
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {suggestions.map((suggestion, index) => (
+                    <Card
+                      key={index}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors border-border/50"
+                      onClick={() => handleSuggestionClick(suggestion.question)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex flex-col space-y-1">
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {suggestion.metric_type}
+                          </span>
+                          <p className="text-sm">{suggestion.question}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
